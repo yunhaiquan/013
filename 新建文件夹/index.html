@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	body{
+		margin: 0;
+		padding: 0;
+	}
+	canvas{
+		display: block;
+		background: #090909;
+	}
+</style>
+<body>
+	<canvas class="rain">
+		
+	</canvas>
+</body>
+<script>
+	var oCanvas = document.querySelector('.rain');
+	console.log(oCanvas);
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+	var aRain = [];//存放所有新生成的雨滴。
+	oCanvas.width = w;
+	oCanvas.height = h;
+	window.onresize = function(){
+		oCanvas.width = w;
+		oCanvas.height = h;
+	}
+	//利用canvas绘制一个图形。
+	var canCon = oCanvas.getContext("2d");  //找到可绘制区域。
+	console.log(canCon);
+	// var y=0;
+	// setInterval(function(){
+	// 	// 抬起笔
+	// 	canCon.fillStyle="rgba(0,0,0,0.01)";
+	// 	canCon.fillRect(0,0,w,h);  
+	// 	// canCon.clearRect(0,0,w,h)  // 擦除绘制图形。
+	// 	canCon.fillStyle = "#3ff";
+	// 	canCon.fillRect(this.x,this.y,this.w,this.h);
+	// },1000/60);
+//面向对象方法
+	function random(min,max){
+		return Math.random()*(max-min)+min;
+	}
+	function Rain(){};		//构造函数 雨滴DNA
+	Rain.prototype={
+	 	init:function(){ 		//DNA的基因
+	 		this.x=random(0,w);			//新生成的雨滴的新的X位置，从浏览器的最左到最右。
+	 		this.y=0;									//新生成的雨滴的新的Y位置，从浏览器的最上到最下。
+	 		this.w = 2;
+	 		this.h = 10;
+	 		this.color='pink';
+	 		this.vy=random(2,3)	//雨滴下降的速度。
+	 		this.height = random(0.8*h,0.9*h);		//雨滴滴落地面的高度。
+	 		this.r = 2; //圆的的半径。变成水珠的半径。
+	 		this.maxR = random(45,130);
+	 	},
+	 	draw:function(){ 
+	 		if(this.y<this.height){
+				canCon.fillStyle=this.color;
+				canCon.fillRect(this.x,this.y,this.w,this.h);  //矩形左上角的坐标，矩形的宽高。
+	 		}
+	 		else{
+	 				canCon.beginPath();					//抬起笔。
+	 				canCon.strokeStyle = this.color;			//给笔上色。 stroke:描边  fill: 填充
+					//绘制圆
+					canCon.arc(this.x,this.y,this.r,0,Math.PI*2); // arc:圆  圆的位置。{圆心的位置（X位置，Y位置）,半径 ，度数}
+					canCon.stroke(); 
+	 			}		
+	 	},
+	 	move:function(){
+	 		if(this.y<this.height){
+				this.y+=this.vy;
+	 		}
+	 		else{
+	 			if(this.r<this.maxR){
+	 				this.r++
+	 			}else{
+	 				this.init();
+	 			}
+	 			
+	 		}
+	 		this.draw();
+	 	}
+	}
+	//有num个雨滴，
+	function creatRain(num,time){
+		for(var i=0;i<num;i++){
+			setTimeout(function(){			//延时器
+				var rain = new Rain();  //根据雨滴DNA创造来的。
+				rain.init();
+				rain.draw();
+				aRain.push(rain);
+			},time*i)  	
+		}
+	}
+	creatRain(100,200);
+
+	setInterval(function(){
+		canCon.fillStyle="rgba(0,0,0,0.099)";
+		canCon.fillRect(0,0,w,h);
+		for(var item of aRain){
+			//item代表数组的每一个元素。
+			item.move()
+		}
+	},1000/60);
+</script>
+</html>
+
+
+
+	
+<!-- 
+	//canCon.fillStyle = "red";			//给笔上色。 stroke:描边  fill: 填充
+	//绘制圆
+	// canCon.arc(233,233,66,0,Math.PI*2); // arc:圆  圆的位置。{圆心的位置（X位置，Y位置）,半径 ，度数}
+	// canCon.stroke(); 
+	//绘制正方形
+	//canCon.fillRect(10,10,100,100); -->
+
+
+<!-- 			// //笔没有抬起来
+		// canCon.beginPath();
+		// canCon.clearRect(0,0,window.innerWidth,window.innerHeight)
+		// canCon.fillStyle = "#3ff";
+		// canCon.rect(10,y++,2,10);
+		// canCon.fill(); -->
